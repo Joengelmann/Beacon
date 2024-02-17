@@ -13,6 +13,7 @@ struct ContentView: View {
                 .tabItem {
                     Image(systemName: "gear")
                     Text("Settings")
+                    
                 }
             MainView()
                 .tabItem {
@@ -37,9 +38,9 @@ struct MainView: View {
         Button(action: {
             print("Button pressed!")
         }) {
-            Text("Press Me")
+            Text("Alert")
                 .padding()
-                .background(Color.blue)
+                .background(Color.black)
                 .foregroundColor(.white)
                 .cornerRadius(100)
                 .frame(width: 200, height: 200)
@@ -52,3 +53,8 @@ struct NetworkView: View {
     }
 }
 
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
+    }
+}
