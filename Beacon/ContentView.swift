@@ -7,7 +7,18 @@
 
 import SwiftUI
 struct ContentView: View {
+
+    @StateObject var alertsManager = AlertsManager()
+    var alertsArray = ["Hi"]
+
+    
+
+
+
     var body: some View {
+        ForEach(alertsManager.alerts, id: \.id) {
+            print("Dick")
+        }
         TabView {
             SettingsView()
                 .tabItem {
