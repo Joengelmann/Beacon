@@ -16,7 +16,7 @@ struct ContentView: View {
 
 
     var body: some View {
-        ForEach(alertsManager.alerts, id: \.id) {
+        ForEach(alertsManager.alerts) {
             print("Dick")
         }
         TabView {
