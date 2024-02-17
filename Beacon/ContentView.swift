@@ -37,16 +37,19 @@ struct MainView: View {
     var body: some View {
         Button(action: {
             print("Button pressed!")
-        }) {
+        }, label: {
             Text("Alert")
                 .padding()
+                .padding(.horizontal, 95)
+                .padding(.vertical,105)
                 .background(Color.black)
                 .foregroundColor(.white)
-                .cornerRadius(100)
-                .frame(width: 200, height: 200)
-        }
+                .cornerRadius(1000)
+                .font(.system(size: 60))
+        })
     }
 }
+
 struct NetworkView: View {
     var body: some View {
         Text("Network")
