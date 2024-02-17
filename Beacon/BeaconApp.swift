@@ -8,7 +8,7 @@
 import SwiftUI
 
 @main
-struct BeaconApp: App {
+struct YourAppNameApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
