@@ -3,7 +3,7 @@ import SwiftUI
 import Foundation
 import FirebaseFirestore
 import FirebaseFirestoreSwift
-
+import UIKit
 
 struct ContentView: View {
     var body: some View {
@@ -80,9 +80,12 @@ struct NetworkView: View {
     @State private var friendIDs: [String] = []
     @State private var friendList: [String] = [] // New v
     
+    let vendorIdentifier = UIDevice.current.identifierForVendor?.uuidString ?? "Unknown"
+        
     var body: some View {
         ZStack{
             VStack(spacing:25){
+                Text(vendorIdentifier)
                 Button(action: {
                     alertView()
                 }) {
@@ -149,9 +152,44 @@ struct NetworkView: View {
 struct SettingsView: View {
     @StateObject var alertsManager = AlertsManager()
     
+    let vendorIdentifier = UIDevice.current.identifierForVendor?.uuidString ?? "Unknown"
+    
     var body: some View {
-        Text(alertsManager.getAlertString())
-        
+        let alertList = alertsManager.getAlerts()
+        //TO DO
+        //Has all the alerts when we only want certain ones
+        VStack{
+            List {
+                Section(header: HStack {
+                    Text("Name").fontWeight(.bold)
+                    Spacer()
+                    Text("Time").fontWeight(.bold)
+                }) {
+                    //let Acount = A.count
+                    ForEach(alertList.indices, id: \.self) { index in
+                        //let alerts = alertsManager.getAlerts()
+                        if(vendorIdentifier == alertList[index].vendorID){
+                            HStack {
+                                Button(action: {
+                                    print("hey") //go to aler
+                                }) {
+                                    Text("\(alertList[index].username) at \(alertList[index].timestamp)")
+                                        .padding()
+                                        .padding(.horizontal, 50)
+                                        .padding(.vertical, 1)
+                                        .background(.green)
+                                        .foregroundColor(.white)
+                                        .cornerRadius(30)
+                                        .font(.system(size: 20))
+                                }
+                            }
+                        }
+                        
+                    }
+                }
+            }
+            
+        }
     }
 }
 
@@ -162,9 +200,10 @@ struct ContentView_Previews: PreviewProvider {
 }
 
 func sendAlert(/*message: String*/){ // send a broadcast to the firebase server
+    let vendorIdentifier = UIDevice.current.identifierForVendor?.uuidString ?? "Unknown"
     let db = Firestore.firestore()
     do{
-        let newAlert = Alert(id:"420",userID:"69",timestamp: Date(),message:"HELP!")
+        let newAlert = Alert(id:"1",vendorID:vendorIdentifier,username:"Jonah",timestamp: Date(),message:"HELP!")
         try db.collection("Alerts").document().setData(from: newAlert)
     }
     catch{

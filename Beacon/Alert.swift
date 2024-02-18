@@ -9,8 +9,8 @@ import Foundation
 
 struct Alert: Identifiable, Codable {
     var id: String
-    var userID: String
+    var vendorID: String
+    var username: String
     var timestamp: Date
     var message: String
-    
 }

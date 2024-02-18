@@ -28,7 +28,7 @@ class AlertsManager: ObservableObject {
 
         }
     }
-    func sendAlert(message: String){ // send a broadcast to the firebase server
+    /*func sendAlert(message: String){ // send a broadcast to the firebase server
         do{
             let newAlert = Alert(id:"420",userID:"69",timestamp: Date(),message:"HELP!")
             try db.collection("Alerts").document().setData(from: newAlert)
@@ -37,7 +37,7 @@ class AlertsManager: ObservableObject {
             print("Error adding alert to Firestore: \(error)")
         }
         
-    }
+    }*/
     
     
     func getAlertString() -> String {
@@ -46,9 +46,16 @@ class AlertsManager: ObservableObject {
         
         var output = ""
         for currAlert in alerts {
+                
                 let dateString = dateFormatter.string(from: currAlert.timestamp)
-                output += "\(currAlert.id)\n\(currAlert.userID)\n\(dateString)\n\(currAlert.message)\n\n"
+                output += "\(currAlert.id)\n\(currAlert.vendorID)\n\(dateString)\n\(currAlert.username)\n\n"
             }
         return output
     }
+    
+    func getAlerts() -> [Alert]{
+            return alerts
+    }
+
+    
 }
