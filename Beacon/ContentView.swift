@@ -63,7 +63,7 @@ struct MainView: View {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                     if (textSize == 20){
                         buttonColor = Color.red
-                        sendAlert()
+                        sendAlert(userList: usersManager.getUsers())
                         buttonText = "Alerted Friends"
                     }
                     else{
@@ -150,7 +150,6 @@ struct NetworkView: View {
                                 ForEach(userList[index].friends.indices, id: \.self) { index2 in
                                     HStack {
                                         Text(getName(id: userList[index].friends[index2],userList: userList))
-                                        //Text(userList[index].friends[index2])
                                     }
                                 }
                             }
@@ -287,7 +286,7 @@ struct MapView_Previews: PreviewProvider {
   }
 }
 final class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
-  @Published var region2 = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 37.334859, longitude: -122.041451), span: MKCoordinateSpan())
+  @Published var region2 = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 37.348884 , longitude: -121.938375), span: MKCoordinateSpan())
   @Published var region1 = MKCoordinateRegion()
   var locationManager: CLLocationManager?
   func checkLocationEnabled() {
@@ -330,11 +329,11 @@ struct ContentView_Previews: PreviewProvider {
     }
 }
 
-func sendAlert(/*message: String*/){ // send a broadcast to the firebase server
+func sendAlert(userList: [User]){ // send a broadcast to the firebase server
     let vendorIdentifier = UIDevice.current.identifierForVendor?.uuidString ?? "Unknown"
     let db = Firestore.firestore()
     do{
-        let newAlert = Alert(id:"1",vendorID:vendorIdentifier,username:"Jonah",timestamp: Date(),message:"HELP!")
+        let newAlert = Alert(id:"1",vendorID:vendorIdentifier,username: getName(id: vendorIdentifier, userList: userList),timestamp: Date(),message:"HELP!")
         try db.collection("Alerts").document().setData(from: newAlert)
     }
     catch{
@@ -362,16 +361,11 @@ func getFriendslist(id: String, userList: [User]) -> [String]{
 }
 
 func login(userslist: [User]) -> Bool{
-    print("1")
     let vendorIdentifier = UIDevice.current.identifierForVendor?.uuidString ?? "Unknown"
     var founduser = false
     if(userslist.count == 0) {return true}
     for index in userslist.indices {
-        //print(userslist.count)
-        print("ven-->\(vendorIdentifier)")
-        print("user-->\(userslist[index].id)")
         if(vendorIdentifier == userslist[index].id){
-            print("Equal!!")
             return true
         }
     }
@@ -380,7 +374,6 @@ func login(userslist: [User]) -> Bool{
 }
 
 func loginPop(){
-    print("2")
     @StateObject var usersManager = UsersManager()
     let vendorIdentifier = UIDevice.current.identifierForVendor?.uuidString ?? "Unknown"
     

@@ -28,17 +28,6 @@ class AlertsManager: ObservableObject {
 
         }
     }
-    /*func sendAlert(message: String){ // send a broadcast to the firebase server
-        do{
-            let newAlert = Alert(id:"420",userID:"69",timestamp: Date(),message:"HELP!")
-            try db.collection("Alerts").document().setData(from: newAlert)
-        }
-        catch{
-            print("Error adding alert to Firestore: \(error)")
-        }
-        
-    }*/
-    
     
     func getAlertString() -> String {
         let dateFormatter = DateFormatter()
