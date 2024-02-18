@@ -48,14 +48,13 @@ struct MainView: View {
     @StateObject var usersManager = UsersManager()
     let vendorIdentifier = UIDevice.current.identifierForVendor?.uuidString ?? "Unknown"
     
-    init(){
-        print("hey")
-        if(!login(usersmanager: usersManager)){
-            loginPop()
-        }
-    }
-    
     var body: some View {
+        let userList = usersManager.getUsers()
+        
+        if(!login(userslist: userList)){
+            
+        }
+        
         Button(action: {
             if(!isPressed){
                 textSize = 20
@@ -390,17 +389,41 @@ func getFriendslist(id: String, userList: [User]) -> [String]{
     return [""]
 }
 
-func login(usersmanager: UsersManager) -> Bool{
+func login(userslist: [User]) -> Bool{
+    print("1")
     let vendorIdentifier = UIDevice.current.identifierForVendor?.uuidString ?? "Unknown"
     var founduser = false
-    
-    let userList = usersmanager.getUsers()
-    
-    for index in userList.indices {
-        print("13")
-        if(vendorIdentifier == userList[index].id){
-            founduser = true
+    if(userslist.count == 0) {return true}
+    for index in userslist.indices {
+        //print(userslist.count)
+        print("ven-->\(vendorIdentifier)")
+        print("user-->\(userslist[index].id)")
+        if(vendorIdentifier == userslist[index].id){
+            print("Equal!!")
+            return true
         }
     }
+    loginPop()
     return(founduser)
+}
+
+func loginPop(){
+    print("2")
+    @StateObject var usersManager = UsersManager()
+    let vendorIdentifier = UIDevice.current.identifierForVendor?.uuidString ?? "Unknown"
+    
+    let alert = UIAlertController(title: "Login", message: "Enter your name", preferredStyle: .alert)
+    alert.addTextField { (pass) in
+        pass.placeholder = "Name"
+    }
+    //Action Buttons...
+    let Add = UIAlertAction(title: "login", style: .default){(_) in
+        usersManager.uploadUser(_name: alert.textFields![0].text!, _id: vendorIdentifier, _friendsList: [])
+    }
+    
+    alert.addAction(Add)
+
+    UIApplication.shared.windows.first?.rootViewController?.present(alert, animated: true, completion: {
+        
+    })
 }
