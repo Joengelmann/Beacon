@@ -39,8 +39,8 @@ struct ContentView: View {
 }
 
 struct MainView: View {
-    @State private var buttonColor: Color = Color.black
-    @State private var buttonText: String = "Alert"
+    @State private var buttonColor: Color = Color(hex: "#584467")
+    @State private var buttonText: String = "Beacon"
     @State private var isPressed: Bool = false
     @State private var textSize: CGFloat = 40.0
     @State var userfound: Bool = false
@@ -67,14 +67,14 @@ struct MainView: View {
                         buttonText = "Alerted Friends"
                     }
                     else{
-                        buttonColor = Color.black
+                        buttonColor = Color(hex: "#584467")
                     }
                 }
             }
             else{
                 textSize = 40
-                buttonColor = Color.black
-                buttonText = "Alert"
+                buttonColor = Color(hex: "#584467")
+                buttonText = "Beacon"
                 isPressed = false
             }
         }, label: {
@@ -121,7 +121,6 @@ struct NetworkView: View {
     var body: some View {
         ZStack{
             VStack(spacing:25){
-                Text(vendorIdentifier)
                 Button(action: {
                     alertView()
                 }) {
@@ -139,9 +138,9 @@ struct NetworkView: View {
                                 
                 List {
                     Section(header: HStack {
-                        Text("IDs").fontWeight(.bold)
+                        Text("").fontWeight(.bold)
                         Spacer()
-                        Text("Names").fontWeight(.bold)
+                        Text("").fontWeight(.bold)
                     }) {
                         let userList = userManager.getUsers()
                         
@@ -157,14 +156,6 @@ struct NetworkView: View {
                             }
                         }
                         
-                        /*
-                        ForEach(Friends.indices, id: \.self) { index in
-                            HStack {
-                                Text("\(friendIDs[index])")
-                                Spacer()
-                                Text("\(friendList[index])")
-                            }
-                        }*/
                     }
                 }
                 Spacer()
@@ -175,9 +166,6 @@ struct NetworkView: View {
     
     func alertView(){
         let alert = UIAlertController(title: "Add Friend", message: "Enter their ID", preferredStyle: .alert)
-        alert.addTextField { (pass) in
-            pass.placeholder = "ID"
-        }
         alert.addTextField { (pass) in
             pass.placeholder = "Name"
         }
@@ -196,7 +184,7 @@ struct NetworkView: View {
             }
            
             for index in userList.indices {
-                if(userList[index].name == alert.textFields![1].text!){
+                if(userList[index].name == alert.textFields![0].text!){
                     for i in Friends{
                         if i == userList[index].id{
                             inlistalready = true
@@ -209,24 +197,8 @@ struct NetworkView: View {
                 }
             }
             
-            /*
-            ForEach(userList.indices, id: \.self) { index in
-                if(userList[index].id == vendorIdentifier){
-                    Name = userList[index].name
-                    Friends = userList[index].friends
-                }
-            }
-            
-            ForEach(userList.indices, id: \.self) { index in
-                if(userList[index].name == alert.textFields![1].text!){
-                    Friends.append(userList[index].id)
-                }
-            }*/
-            
             userManager.uploadUser(_name: Name, _id: vendorIdentifier, _friendsList: Friends)
             
-            //friendIDs.append(alert.textFields![0].text!)
-            //friendList.append(alert.textFields![1].text!)
         }
         let cancel = UIAlertAction(title: "Cancel", style: .destructive){(_) in
             //stuff
@@ -257,9 +229,9 @@ struct AlertsView: View {
         VStack{
             List {
                 Section(header: HStack {
-                    Text("Name").fontWeight(.bold)
                     Spacer()
-                    Text("Time").fontWeight(.bold)
+                    Text("Alert").fontWeight(.bold)
+                    Spacer()
                 }) {
                     ForEach(alertList.indices, id: \.self) { index in
                         ForEach(getFriendslist(id: vendorIdentifier,userList: userList).indices, id: \.self) { index2 in
@@ -271,8 +243,8 @@ struct AlertsView: View {
                                                 .padding()
                                                 .padding(.horizontal, 50)
                                                 .padding(.vertical, 1)
-                                                .background(.green)
-                                                .foregroundColor(.white)
+                                                .background(Color(hex: "#85799E"))
+                                                .foregroundColor(Color(hex: "#EFE8FD"))
                                                 .cornerRadius(30)
                                                 .font(.system(size: 20))
                                         })
@@ -426,4 +398,25 @@ func loginPop(){
     UIApplication.shared.windows.first?.rootViewController?.present(alert, animated: true, completion: {
         
     })
+}
+
+extension Color {
+    init(hex: String) {
+        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
+        var int: UInt64 = 0
+        Scanner(string: hex).scanHexInt64(&int)
+        let a, r, g, b: UInt64
+        switch hex.count {
+        case 3: // RGB (12-bit)
+            (a, r, g, b) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
+        case 6: // RGB (24-bit)
+            (a, r, g, b) = (255, int >> 16, int >> 8 & 0xFF, int & 0xFF)
+        case 8: // ARGB (32-bit)
+            (a, r, g, b) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
+        default:
+            (a, r, g, b) = (255, 0, 0, 0)
+        }
+
+        self.init(.sRGB, red: Double(r) / 255, green: Double(g) / 255, blue:  Double(b) / 255, opacity: Double(a) / 255)
+    }
 }
