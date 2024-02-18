@@ -50,22 +50,6 @@ struct MainView: View {
     }
     
     var body: some View {
-        
-
-        /*
-        safeAreaInset(edge: .top) {
-            Button(action: {}) {}.onAppear() {
-                print("hey")
-                //if(!usersManager.login()){
-                    //alertView()
-                  //}
-            }
-        }*/
-        //let userList = usersManager.getUsers()
-        
-
-        
-        
         Button(action: {
             if(!isPressed){
                 textSize = 20
@@ -125,6 +109,8 @@ struct NetworkView: View {
     @State private var friendIDs: [String] = []
     @State private var friendList: [String] = [] // New v
     
+    @StateObject var userManager = UsersManager()
+    
     let vendorIdentifier = UIDevice.current.identifierForVendor?.uuidString ?? "Unknown"
         
     var body: some View {
@@ -152,13 +138,27 @@ struct NetworkView: View {
                         Spacer()
                         Text("Names").fontWeight(.bold)
                     }) {
-                        ForEach(friendIDs.indices, id: \.self) { index in
+                        let userList = userManager.getUsers()
+                        
+                            
+                        ForEach(userList.indices, id: \.self) { index in
+                            if(vendorIdentifier == userList[index].id){
+                                ForEach(userList[index].friends.indices, id: \.self) { index2 in
+                                    HStack {
+                                        Text(userList[index].friends[index2])
+                                    }
+                                }
+                            }
+                        }
+                        
+                        /*
+                        ForEach(Friends.indices, id: \.self) { index in
                             HStack {
                                 Text("\(friendIDs[index])")
                                 Spacer()
                                 Text("\(friendList[index])")
                             }
-                        }
+                        }*/
                     }
                 }
                 Spacer()
@@ -177,8 +177,50 @@ struct NetworkView: View {
         }
         //Action Buttons...
         let Add = UIAlertAction(title: "Add", style: .default){(_) in
-            friendIDs.append(alert.textFields![0].text!)
-            friendList.append(alert.textFields![1].text!)
+            let userList = userManager.getUsers()
+            var Name = ""
+            var Friends:[String] = []
+            var inlistalready = false
+            
+            for index in userList.indices { //find your username and friends
+                if userList[index].id == vendorIdentifier {
+                    Name = userList[index].name
+                    Friends = userList[index].friends
+                }
+            }
+           
+            for index in userList.indices {
+                if(userList[index].name == alert.textFields![1].text!){
+                    for i in Friends{
+                        if i == userList[index].id{
+                            inlistalready = true
+                            break
+                        }
+                    }
+                    if(!inlistalready){
+                        Friends.append(userList[index].id)
+                    }
+                }
+            }
+            
+            /*
+            ForEach(userList.indices, id: \.self) { index in
+                if(userList[index].id == vendorIdentifier){
+                    Name = userList[index].name
+                    Friends = userList[index].friends
+                }
+            }
+            
+            ForEach(userList.indices, id: \.self) { index in
+                if(userList[index].name == alert.textFields![1].text!){
+                    Friends.append(userList[index].id)
+                }
+            }*/
+            
+            userManager.uploadUser(_name: Name, _id: vendorIdentifier, _friendsList: Friends)
+            
+            //friendIDs.append(alert.textFields![0].text!)
+            //friendList.append(alert.textFields![1].text!)
         }
         let cancel = UIAlertAction(title: "Cancel", style: .destructive){(_) in
             //stuff

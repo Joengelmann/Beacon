@@ -51,7 +51,11 @@ class UsersManager: ObservableObject {
     func login() -> Bool{
         let vendorIdentifier = UIDevice.current.identifierForVendor?.uuidString ?? "Unknown"
         var founduser = false
+        
+        let userList = self.getUsers()
+        
         print(users.count)
+        
         for i in users{
             print(i.id)
             print(vendorIdentifier)
