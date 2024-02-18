@@ -5,20 +5,17 @@
 //  Created by Jonah Engelmann on 2/17/24.
 //
 
+
+
 import SwiftUI
+import Foundation
+import FirebaseFirestore
+import FirebaseFirestoreSwift
+
+
 struct ContentView: View {
-
-    @StateObject var alertsManager = AlertsManager()
-    var alertsArray = ["Hi"]
-
-    
-
-
-
     var body: some View {
-        ForEach(alertsManager.alerts) {
-            print("Dick")
-        }
+        
         TabView {
             SettingsView()
                 .tabItem {
@@ -40,14 +37,18 @@ struct ContentView: View {
     }
 }
 struct SettingsView: View {
+    @StateObject var alertsManager = AlertsManager()
+    
     var body: some View {
-        Text("Settings")
+        Text(alertsManager.getAlertString())
+        
     }
 }
 struct MainView: View {
     var body: some View {
         Button(action: {
             print("Button pressed!")
+            sendAlert()
         }, label: {
             Text("Alert")
                 .padding()
@@ -71,4 +72,16 @@ struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
     }
+}
+
+func sendAlert(/*message: String*/){ // send a broadcast to the firebase server
+    let db = Firestore.firestore()
+    do{
+        let newAlert = Alert(id:"420",userID:"69",timestamp: Date(),message:"HELP!")
+        try db.collection("Alerts").document().setData(from: newAlert)
+    }
+    catch{
+        print("Error adding alert to Firestore: \(error)")
+    }
+    
 }
