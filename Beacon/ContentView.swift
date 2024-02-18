@@ -44,7 +44,7 @@ struct MainView: View {
     
     init(){
         print("hey")
-        if(!usersManager.login()){
+        if(!login(usersmanager: usersManager)){
             loginPop()
         }
     }
@@ -145,7 +145,8 @@ struct NetworkView: View {
                             if(vendorIdentifier == userList[index].id){
                                 ForEach(userList[index].friends.indices, id: \.self) { index2 in
                                     HStack {
-                                        Text(userList[index].friends[index2])
+                                        Text(getName(id: userList[index].friends[index2],userList: userList))
+                                        //Text(userList[index].friends[index2])
                                     }
                                 }
                             }
@@ -238,11 +239,13 @@ struct NetworkView: View {
 
 struct AlertsView: View {
     @StateObject var alertsManager = AlertsManager()
+    @StateObject var userManager = UsersManager()
     
     let vendorIdentifier = UIDevice.current.identifierForVendor?.uuidString ?? "Unknown"
     
     var body: some View {
         let alertList = alertsManager.getAlerts()
+        let userList = userManager.getUsers()
         //TO DO
         //Has all the alerts when we only want certain ones
         VStack{
@@ -252,26 +255,25 @@ struct AlertsView: View {
                     Spacer()
                     Text("Time").fontWeight(.bold)
                 }) {
-                    //let Acount = A.count
                     ForEach(alertList.indices, id: \.self) { index in
-                        //let alerts = alertsManager.getAlerts()
-                        if(vendorIdentifier == alertList[index].vendorID){
-                            HStack {
-                                Button(action: {
-                                    print("hey") //go to map
-                                }) {
-                                    Text("\(alertList[index].username) at \(alertList[index].timestamp)")
-                                        .padding()
-                                        .padding(.horizontal, 50)
-                                        .padding(.vertical, 1)
-                                        .background(.green)
-                                        .foregroundColor(.white)
-                                        .cornerRadius(30)
-                                        .font(.system(size: 20))
+                        ForEach(getFriendslist(id: vendorIdentifier,userList: userList).indices, id: \.self) { index2 in
+                            if(getFriendslist(id: vendorIdentifier,userList: userList)[index2] == alertList[index].vendorID){
+                                HStack {
+                                    Button(action: {
+                                        print("hey") //go to map
+                                    }) {
+                                        Text("\(alertList[index].username) at \(alertList[index].timestamp)")
+                                            .padding()
+                                            .padding(.horizontal, 50)
+                                            .padding(.vertical, 1)
+                                            .background(.green)
+                                            .foregroundColor(.white)
+                                            .cornerRadius(30)
+                                            .font(.system(size: 20))
+                                    }
                                 }
                             }
                         }
-                        
                     }
                 }
             }
@@ -297,4 +299,37 @@ func sendAlert(/*message: String*/){ // send a broadcast to the firebase server
         print("Error adding alert to Firestore: \(error)")
     }
     
+}
+
+func getName(id: String, userList: [User]) -> String{
+    for index in userList.indices{
+        if(userList[index].id == id){
+            return userList[index].name
+        }
+    }
+    return ""
+}
+
+func getFriendslist(id: String, userList: [User]) -> [String]{
+    for index in userList.indices{
+        if(userList[index].id == id){
+            return userList[index].friends
+        }
+    }
+    return [""]
+}
+
+func login(usersmanager: UsersManager) -> Bool{
+    let vendorIdentifier = UIDevice.current.identifierForVendor?.uuidString ?? "Unknown"
+    var founduser = false
+    
+    let userList = usersmanager.getUsers()
+    
+    for index in userList.indices {
+        print("13")
+        if(vendorIdentifier == userList[index].id){
+            founduser = true
+        }
+    }
+    return(founduser)
 }

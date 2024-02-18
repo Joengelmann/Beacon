@@ -48,6 +48,7 @@ class UsersManager: ObservableObject {
             return users
     }
     
+    /*
     func login() -> Bool{
         let vendorIdentifier = UIDevice.current.identifierForVendor?.uuidString ?? "Unknown"
         var founduser = false
@@ -64,5 +65,5 @@ class UsersManager: ObservableObject {
             }
         }
         return(founduser)
-    }
+    }*/
 }
