@@ -4,8 +4,12 @@ import Foundation
 import FirebaseFirestore
 import FirebaseFirestoreSwift
 import UIKit
+import MapKit
+
+
 
 struct ContentView: View {
+
     @State var TestText: String = "test11"
     var body: some View {
         
@@ -29,6 +33,8 @@ struct ContentView: View {
                     
                 }
         }
+     
+        
     }
 }
 
@@ -248,6 +254,7 @@ struct AlertsView: View {
         let userList = userManager.getUsers()
         //TO DO
         //Has all the alerts when we only want certain ones
+        NavigationView{
         VStack{
             List {
                 Section(header: HStack {
@@ -258,19 +265,22 @@ struct AlertsView: View {
                     ForEach(alertList.indices, id: \.self) { index in
                         ForEach(getFriendslist(id: vendorIdentifier,userList: userList).indices, id: \.self) { index2 in
                             if(getFriendslist(id: vendorIdentifier,userList: userList)[index2] == alertList[index].vendorID){
-                                HStack {
-                                    Button(action: {
-                                        print("hey") //go to map
-                                    }) {
-                                        Text("\(alertList[index].username) at \(alertList[index].timestamp)")
-                                            .padding()
-                                            .padding(.horizontal, 50)
-                                            .padding(.vertical, 1)
-                                            .background(.green)
-                                            .foregroundColor(.white)
-                                            .cornerRadius(30)
-                                            .font(.system(size: 20))
-                                    }
+                                
+                                    HStack {
+                                        NavigationLink(destination: MapView(), label:{
+                                            Text("\(alertList[index].username) at \(alertList[index].timestamp)")
+                                                .padding()
+                                                .padding(.horizontal, 50)
+                                                .padding(.vertical, 1)
+                                                .background(.green)
+                                                .foregroundColor(.white)
+                                                .cornerRadius(30)
+                                                .font(.system(size: 20))
+                                        })
+
+                                        }
+                                }
+                            
                                 }
                             }
                         }
@@ -280,8 +290,69 @@ struct AlertsView: View {
             
         }
     }
-}
 
+struct MapView: View {
+  @StateObject private var viewModel = MapViewModel()
+  @State var camera: MapCameraPosition = .automatic
+  var body: some View {
+    Map(position: $camera){
+      Annotation("You", coordinate: viewModel.region1.center){
+        Image(systemName: "circle.fill")
+        .foregroundColor(.blue)      }
+      Annotation("Friend", coordinate: viewModel.region2.center){
+        Image(systemName: "circle.fill")
+          .foregroundColor(.red)
+      }
+    }
+    .ignoresSafeArea()
+    .onAppear {
+      viewModel.checkLocationEnabled()
+    }
+  }
+  }
+struct MapView_Previews: PreviewProvider {
+  static var previews: some View {
+    MapView()
+  }
+}
+final class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
+  @Published var region2 = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 37.334859, longitude: -122.041451), span: MKCoordinateSpan())
+  @Published var region1 = MKCoordinateRegion()
+  var locationManager: CLLocationManager?
+  func checkLocationEnabled() {
+    if CLLocationManager.locationServicesEnabled() {
+      locationManager = CLLocationManager()
+      locationManager?.desiredAccuracy = kCLLocationAccuracyBest
+      locationManager!.delegate = self
+      checkLocationAuthorization()
+    } else {
+      print("Must turn on location services")
+    }
+  }
+  private func checkLocationAuthorization() {
+    guard let locationManager = locationManager else { return }
+    switch locationManager.authorizationStatus {
+        case .notDetermined :
+          locationManager.requestWhenInUseAuthorization()
+        case .restricted:
+          print("Location is restricted, likely due to parental controls.")
+        case .denied:
+          print("You have denied this app location permission. Go into settings and change it.")
+        case .authorizedWhenInUse, .authorizedAlways:
+          locationManager.startUpdatingLocation()
+        @unknown default:
+          break
+        }
+  }
+  func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+    checkLocationAuthorization()
+  }
+  func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+    if let location = locations.last {
+      region1 = MKCoordinateRegion(center: location.coordinate, span: MKCoordinateSpan())
+    }
+  }
+}
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
