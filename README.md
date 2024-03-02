@@ -2,7 +2,7 @@
 As college students, we're all too aware that uncomfortable and threatening social interactions unfold around us every day. Whether it be sexual harassment at parties or aggressive confrontations due to social drama, we believe that said interactions are best resolved through intervention by the close friends of those involved.
 
 ### What it does
-Our app provides a discrete way for users to send an alert to friends, asking for support without having to text individuals and guess who may be nearby. Anyone who is friends with the person in distress will receive a notification with a name, timestamp, and location of the alert. They can then use this information to respond to their friend's signal if possible.
+Our app provides a discrete way for users to send an alert to friends, asking for support without having to text individuals and guess who may be nearby. Anyone who is friends with the person in distress will receive a notification with a name, timestamp, and location of the alert. They can then use this information to respond to their friend's signal if possible. Check out the [Devpost](https://devpost.com/software/beacon-aqdfic) to see an app demo, screenshots, and more!
 
 ### How we built it
 We used SwiftUI in XCode to build an IOS application, and used Firebase/Firestore to host the data for users and alerts online.
